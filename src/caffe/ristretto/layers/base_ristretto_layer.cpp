@@ -84,6 +84,10 @@ void BaseRistrettoLayer<Dtype>::QuantizeLayerOutputs_cpu(
 template <typename Dtype>
 void BaseRistrettoLayer<Dtype>::Trim2FixedPoint_cpu(Dtype* data, const int cnt,
       const int bit_width, const int rounding, int fl) {
+if(bit_width>=32)
+{//no need to trim
+  return;//test
+}
   for (int index = 0; index < cnt; ++index) {
     // Saturate data
     Dtype max_data = (pow(2, bit_width - 1) - 1) * pow(2, -fl);

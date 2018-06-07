@@ -10,6 +10,7 @@ namespace bp = boost::python;
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "boost/algorithm/string.hpp"
 #include "caffe/caffe.hpp"
@@ -416,6 +417,133 @@ int time() {
   return 0;
 }
 RegisterBrewFunction(time);
+
+void show_layer(Blob<float> *blob_in)
+{
+  vector<int> shape = blob_in->shape();
+  std::cout << std::endl;
+  for (int ni = 0; ni < 1; ni++)
+  {
+    std::cout << "Batch " << ni << ":";
+    //for (int ci = 0; ci < shape[1]; ci++)
+    for (int ci = 0; ci < 1; ci++)
+    {
+      std::cout << "Channel " << ci << ":";
+      for (int hi = 0; hi < shape[2]/4; hi++)
+      {
+        for (int wi = 0; wi < shape[3]; wi++)
+        {
+           float fdata = blob_in->data_at(ni, ci, hi, wi);
+           std::cout << fdata << " ";
+        }
+        std::cout << "\n";
+      }
+      std::cout << "\n";
+    }
+    std::cout << "\n";
+  }
+}
+
+void show_param4d_sharedp(shared_ptr<Blob<float> > blob_in)
+{
+  vector<int> shape = blob_in->shape();
+  std::cout << std::endl;
+  for (int ni = 0; ni < 1; ni++)
+  {
+    std::cout << "Kernel " << ni << ":";
+    //for (int ci = 0; ci < shape[1]; ci++)
+    for (int ci = 0; ci < shape[1]; ci++)
+    {
+      std::cout << "in " << ci << ":";
+      for (int hi = 0; hi < shape[2]; hi++)
+      {
+        for (int wi = 0; wi < shape[3]; wi++)
+        {
+           float fdata = blob_in->data_at(ni, ci, hi, wi);
+           std::cout << fdata << " ";
+        }
+        std::cout << "\n";
+      }
+      std::cout << "\n";
+    }
+    std::cout << "\n";
+  }
+}
+
+void show_param1d_sharedp(shared_ptr<Blob<float> > blob_in)
+{
+  vector<int> shape = blob_in->shape();
+  std::cout << std::endl;
+  for (int ni = 0; ni < 1; ni++)
+  {
+    std::cout << "Kernel " << ni << ":";
+    float fdata = blob_in->data_at(ni, 1, 1, 1);
+    std::cout << fdata << " ";
+    std::cout << "\n";
+  }
+}
+
+
+// Time: benchmark the execution test layer of a model.
+int test_layer() {
+  CHECK_GT(FLAGS_model.size(), 0) << "Need a model definition to time.";
+  vector<string> stages = get_stages_from_flags();
+
+  // Set device id and mode
+  vector<int> gpus;
+  get_gpus(&gpus);
+  if (gpus.size() != 0) {
+    LOG(INFO) << "Use GPU with device ID " << gpus[0];
+    Caffe::SetDevice(gpus[0]);
+    Caffe::set_mode(Caffe::GPU);
+  } else {
+    LOG(INFO) << "Use CPU.";
+    Caffe::set_mode(Caffe::CPU);
+  }
+  // Instantiate the caffe net.
+  Net<float> caffe_net(FLAGS_model, caffe::TEST, FLAGS_level, &stages);
+  caffe_net.CopyTrainedLayersFrom(FLAGS_weights);
+
+  LOG(INFO) << "Performing Forward";
+
+  const vector<shared_ptr<Layer<float> > >& layers = caffe_net.layers();
+  const vector<vector<Blob<float>*> >& bottom_vecs = caffe_net.bottom_vecs();
+  const vector<vector<Blob<float>*> >& top_vecs = caffe_net.top_vecs();
+
+  LOG(INFO) << "*** Benchmark begins ***";
+
+  for (int j = 0; j < FLAGS_iterations; ++j) {
+    //for (int i = 0; i < layers.size(); ++i) {
+    for (int i = 0; i < 8; ++i) {
+      layers[i]->Forward(bottom_vecs[i], top_vecs[i]);
+      vector<shared_ptr<Blob<float> > > learnp = layers[i]->blobs();
+      if (bottom_vecs[i].size() == 0) continue;
+      Blob<float> *blob_in = bottom_vecs[i][0];
+      Blob<float> *blob_out = top_vecs[i][0];
+      LOG(INFO) << '\n' << i << ":" << layers[i]->type()
+                << " [" << blob_in->shape_string() << "]"
+                << " [" << blob_out->shape_string() << "]"
+                << learnp.size();
+      if (i == 2)
+      {
+        //show_layer(blob_in);
+        show_layer(blob_out);
+        shared_ptr<Blob<float> > learnp0 = learnp[0];
+        shared_ptr<Blob<float> > learnp1 = learnp[1];
+        show_param4d_sharedp(learnp0);
+        show_param1d_sharedp(learnp1);
+        std::cout << learnp0->shape_string() << ", " << learnp1->shape_string() << '\n';
+      }
+    }
+  }
+
+  LOG(INFO) << "*** Benchmark ends ***";
+
+  return 0;
+}
+RegisterBrewFunction(test_layer);
+
+
 
 int main(int argc, char** argv) {
   // Print output to stderr (while still logging).
