@@ -19,6 +19,7 @@ ConvolutionRistrettoLayer<Dtype>::ConvolutionRistrettoLayer(
     this->bw_params_bias_ = this->layer_param_.quantization_param().bw_params_bias();
     this->fl_layer_in_ = this->layer_param_.quantization_param().fl_layer_in();
     this->fl_layer_out_ = this->layer_param_.quantization_param().fl_layer_out();
+    this->fl_params_ = this->layer_param_.quantization_param().fl_params();
     this->fl_params_bias_ = this->layer_param_.quantization_param().fl_params_bias();
     break;
   case QuantizationParameter_Precision_MINIFLOAT:

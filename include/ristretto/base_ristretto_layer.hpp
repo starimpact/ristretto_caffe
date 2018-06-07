@@ -25,9 +25,9 @@ class BaseRistrettoLayer{
   void QuantizeLayerOutputs_gpu(Dtype* data, const int count);
   void QuantizeLayerInputs_gpu(Dtype* data, const int count);
   void QuantizeWeights_cpu(vector<shared_ptr<Blob<Dtype> > > weights_quantized,
-      const int rounding, const bool bias_term = false);
+      const int rounding, const bool bias_term = true);
   void QuantizeWeights_gpu(vector<shared_ptr<Blob<Dtype> > > weights_quantized,
-      const int rounding, const bool bias_term = false);
+      const int rounding, const bool bias_term = true);
   /**
    * @brief Trim data to fixed point.
    * @param fl The number of bits in the fractional part.
