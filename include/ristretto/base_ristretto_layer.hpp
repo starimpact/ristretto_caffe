@@ -25,9 +25,9 @@ class BaseRistrettoLayer{
   void QuantizeLayerOutputs_gpu(Dtype* data, const int count);
   void QuantizeLayerInputs_gpu(Dtype* data, const int count);
   void QuantizeWeights_cpu(vector<shared_ptr<Blob<Dtype> > > weights_quantized,
-      const int rounding, const bool bias_term = true);
+      const int rounding, const bool bias_term = false);
   void QuantizeWeights_gpu(vector<shared_ptr<Blob<Dtype> > > weights_quantized,
-      const int rounding, const bool bias_term = true);
+      const int rounding, const bool bias_term = false);
   /**
    * @brief Trim data to fixed point.
    * @param fl The number of bits in the fractional part.
@@ -60,9 +60,9 @@ class BaseRistrettoLayer{
   inline double RandUniform_cpu();
   // The number of bits used for dynamic fixed point parameters and layer
   // activations.
-  int bw_params_, bw_layer_in_, bw_layer_out_;
+  int bw_params_, bw_params_bias_, bw_layer_in_, bw_layer_out_;
   // The fractional length of dynamic fixed point numbers.
-  int fl_params_, fl_layer_in_, fl_layer_out_;
+  int fl_params_, fl_params_bias_, fl_layer_in_, fl_layer_out_;
   // The number of bits used to represent mantissa and exponent of minifloat
   // numbers.
   int fp_mant_, fp_exp_;

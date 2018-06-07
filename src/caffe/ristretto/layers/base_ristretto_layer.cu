@@ -21,7 +21,7 @@ void BaseRistrettoLayer<Dtype>::QuantizeWeights_gpu(
     Trim2FixedPoint_gpu(weight, cnt_weight, bw_params_, rounding, fl_params_);
     if (bias_term) {
       Trim2FixedPoint_gpu(weights_quantized[1]->mutable_gpu_data(),
-          weights_quantized[1]->count(), bw_params_, rounding, fl_params_);
+          weights_quantized[1]->count(), bw_params_bias_, rounding, fl_params_bias_);
     }
     break;
   case QuantizationParameter_Precision_INTEGER_POWER_OF_2_WEIGHTS:

@@ -450,6 +450,9 @@ message QuantizationParameter{
   // Integer-power-of-two weights
   optional int32 exp_min = 11 [default = -8];
   optional int32 exp_max = 12 [default = -1];
+
+  optional uint32 bw_params_bias = 13 [default = 32];
+  optional int32 fl_params_bias = 14 [default = 16];
 }
 
 // Message that stores parameters used to apply transformation
