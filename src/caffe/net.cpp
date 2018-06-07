@@ -395,6 +395,44 @@ void Net<Dtype>::RangeInLayers(vector<string>* layer_name,
   }
 }
 
+// added by mzhang
+template <typename Dtype>
+void Net<Dtype>::RangeInLayers(vector<string>* layer_name,
+      vector<Dtype>* max_in, vector<Dtype>* max_out, vector<Dtype>* max_param, vector<Dtype>* max_param_bias) {
+  // Initialize vector elements, if needed.
+  if(layer_name->size()==0) {
+    for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+      if (strcmp(layers_[layer_id]->type(), "Convolution") == 0 ||
+          strcmp(layers_[layer_id]->type(), "InnerProduct") == 0) {
+        layer_name->push_back(this->layer_names()[layer_id]);
+        max_in->push_back(0);
+        max_out->push_back(0);
+        max_param->push_back(0);
+        max_param_bias->push_back(0);
+      }
+    }
+  }
+  // Find maximal values.
+  int index = 0;
+  Dtype max_val;
+  for (int layer_id = 0; layer_id < layers_.size(); ++layer_id) {
+    if (strcmp(layers_[layer_id]->type(), "Convolution") == 0 ||
+          strcmp(layers_[layer_id]->type(), "InnerProduct") == 0) {
+      max_val = findMax(bottom_vecs_[layer_id][0]);
+      max_in->at(index) = std::max(max_in->at(index), max_val);
+      max_val = findMax(top_vecs_[layer_id][0]);
+      max_out->at(index) = std::max(max_out->at(index), max_val);
+      // weights
+      max_val = findMax(&(*layers_[layer_id]->blobs()[0]));
+      max_param->at(index) = std::max(max_param->at(index), max_val);
+      // bias
+      max_val = findMax(&(*layers_[layer_id]->blobs()[1]));
+      max_param_bias->at(index) = std::max(max_param_bias->at(index), max_val);
+      index++;
+    }
+  }
+}
+
 // Helper for Net::Init: add a new top blob to the net.
 template <typename Dtype>
 void Net<Dtype>::AppendTop(const NetParameter& param, const int layer_id,

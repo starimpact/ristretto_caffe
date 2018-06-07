@@ -67,7 +67,8 @@ private:
    */
   void EditNetDescriptionDynamicFixedPoint(caffe::NetParameter* param,
       const string layers_2_quantize, const string network_part,
-      const int bw_conv, const int bw_fc, const int bw_in, const int bw_out);
+      const int bw_conv, const int bw_fc, const int bw_in, const int bw_out, 
+      const int bw_conv_bias, const int bw_fc_bias);
   /**
    * @brief Change network to minifloat.
    */
@@ -82,6 +83,8 @@ private:
    * certain layer.
    */
   int GetIntegerLengthParams(const string layer_name);
+
+  int GetIntegerLengthParamsBias(const string layer_name);
   /**
    * @brief Find the integer length for dynamic fixed point inputs of a certain
    * layer.
@@ -103,19 +106,22 @@ private:
   float test_score_baseline_;
   // The maximal absolute values of layer inputs, parameters and
   // layer outputs.
-  vector<float> max_in_, max_params_, max_out_;
+  vector<float> max_in_, max_params_, max_params_bias_, max_out_;
 
   // The integer bits for dynamic fixed point layer inputs, parameters and
   // layer outputs.
-  vector<int> il_in_, il_params_, il_out_;
+  vector<int> il_in_, il_params_, il_params_bias_, il_out_;
   // The name of the layers that need to be quantized to dynamic fixed point.
   vector<string> layer_names_;
   // The number of bits used for dynamic fixed point layer inputs, parameters
   // and layer outputs.
-  int bw_in_, bw_conv_params_, bw_fc_params_, bw_out_;
+  int bw_in_, bw_conv_params_, bw_conv_params_bias_, bw_fc_params_, bw_fc_params_bias_, bw_out_;
 
   // The number of bits used for minifloat exponent.
   int exp_bits_;
+
+  int max_bit;
+  int min_bit;
 };
 
 #endif // QUANTIZATION_HPP_
