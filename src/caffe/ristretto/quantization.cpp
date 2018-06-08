@@ -22,7 +22,7 @@ Quantization::Quantization(string model, string weights, string model_quantized,
   this->error_margin_ = error_margin;
   this->gpus_ = gpus;
   this->max_bit = 16;
-  this->min_bit = 16;
+  this->min_bit = 4;
 
   // Could possibly improve choice of exponent. Experiments show LeNet needs
   // 4bits, but the saturation border is at 3bits (when assuming infinitely long
