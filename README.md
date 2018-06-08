@@ -1,4 +1,4 @@
-# Caffe
+# Ristretto Caffe by Starimpact
 
 ### This ristretto caffe repository is maintained by ming zhang.
 

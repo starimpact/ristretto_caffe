@@ -1,0 +1,16 @@
+# Ristretto
+
+net: "models/vgg19/zm_quantize/quantized.prototxt"
+snapshot_prefix: "models/vgg19/snapshot"
+solver_mode: GPU
+base_lr: 0.0001
+display: 10
+max_iter: 2000
+iter_size: 32 #global batch size = batch_size * iter_size
+lr_policy: "fixed"
+momentum: 0.9
+weight_decay: 0.0002
+snapshot: 100
+test_iter: 20
+test_interval: 100
+solver_type: SGD
